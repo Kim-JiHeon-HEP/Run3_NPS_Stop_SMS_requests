@@ -17,4 +17,4 @@ Total: 3,371 mass points · ~543 M events per campaign (see request CSV).
 
 Request CSV: to be added with the `csv_for_requests` submission.
 
-Contact: Jiheon Kim (KNU, NPS) — Aug 2026
+Contact: Jiheon Kim (KNU) — jiheon.kim@cern.ch — Aug 2026
