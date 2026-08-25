@@ -15,6 +15,7 @@ request (Run 3, 13.6 TeV) — 6 topologies:
 
 Total: 3,371 mass points · ~543 M events per campaign (see request CSV).
 
-Request CSV: to be added with the `csv_for_requests` submission.
+Request CSV (draft): [`csv/nps_stop_sms_requests_draft.csv`](csv/nps_stop_sms_requests_draft.csv) — 215 rows, one per dataset. Column order to be aligned with the official template
+(`csv_for_requests/template_sus_requests.csv`) before submission.
 
 Contact: Jiheon Kim (KNU) — jiheon.kim@cern.ch — Aug 2026
