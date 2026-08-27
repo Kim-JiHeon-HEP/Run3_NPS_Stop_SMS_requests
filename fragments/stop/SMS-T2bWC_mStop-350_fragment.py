@@ -89,25 +89,53 @@ generator = cms.EDFilter("Pythia8GeneratorFilter",
 
 model = "T2bWC"
 
-# MLM matching scale. Taken from the approved-request table unchanged (2026-08-14 decision:
-# a function of mStop, not a constant).
-# Why topology-independent: matching happens between the gridpack (hard process) and the shower;
-# decays come after. As long as T2cc/T2ttC/T2bWC share one gridpack (SMS-StopStop, xqcut 30)
-# there is nothing topology-dependent to split.
+# MLM matching parameters, indexed by mStop.
+#
+#   qcut    -- UNCHANGED, inherited verbatim from the approved request. This is a
+#              value we *choose*, not one we measure, and the efficiencies below
+#              were measured with exactly these qcut values: changing qcut would
+#              invalidate them.
+#   tru_eff -- REPLACED with our own measurement (see provenance below). The table
+#              we inherited was measured on a different gridpack, and disagreed
+#              with our gridpacks by up to 26% (worst point in this family).
+#
+# Provenance of tru_eff
+#   Measured in a private GEN validation run (CMSSW_14_0_22_patch1, HTCondor, 2026-08),
+#   using these very fragments with a single mass point left in each. Efficiency is
+#   accepted/tried as reported by the Pythia8 MLM matching veto, i.e. the same
+#   quantity McM calls the match efficiency.
+#   Statistics: 331,000 generated events over 19 distinct mStop values
+#   (every mStop value that appears in this request was measured; none is interpolated).
+#   Topology and LSP mass are folded together: at fixed mStop the topologies and
+#   DeltaM values we cross-checked agreed to within 1.0 sigma (22 points, 6 groups).
+#   That is expected -- MLM matching happens between the hard process and the parton
+#   shower, while the SUSY decay chain is applied afterwards.
+#   T2cc/T2ttC/T2bWC all read the same gridpack (SMS-StopStop, xqcut 30), so there is
+#   nothing topology-dependent left for matching to see.
+#
+# Binning rule
+#   Steps are placed where qcut steps, so that qcut(mass) is bit-for-bit what the
+#   approved request had. Within each qcut interval the measured points are tested
+#   against a single constant; if they are consistent (chi2 p-value >= 0.05) they
+#   are merged and the row carries their weighted mean. 4 of the 5 qcut intervals
+#   passed unchanged. Intervals that failed are split further (still inside the same
+#   qcut interval, so qcut is still untouched); those rows are marked SPLIT below.
+#   Point-by-point values are deliberately NOT used: at 2k events per point the
+#   binomial spread alone is about +-1.0 percentage point, which would put noise
+#   into the table as if it were structure.
+#
+# Columns below: <upper bound>  qcut  tru_eff  [n points, events, chi2/ndf, p]
 def matchParams(mass):
-  if mass < 649: return 62., 0.274
-  elif mass < 699: return 64., 0.269
-  elif mass < 749: return 64., 0.269
-  elif mass < 799: return 66., 0.259
-  elif mass < 849: return 66., 0.261
-  elif mass < 899: return 68., 0.257
-  elif mass < 949: return 68., 0.252
-  elif mass < 999: return 70., 0.250
-  elif mass < 1049: return 70., 0.248
-  elif mass < 1099: return 70., 0.248
-  elif mass < 1149: return 70., 0.249
-  elif mass < 1199: return 70., 0.242
-  elif mass < 1249: return 70., 0.239
+  if mass < 399: return 62., 0.3440     # 300-350: 2 pts, 200,000 ev, chi2/ndf 1.8/1, p 0.179, SPLIT
+  elif mass < 649: return 62., 0.2878   # 400-600: 5 pts, 10,000 ev, chi2/ndf 3.2/4, p 0.531, SPLIT
+  elif mass < 749: return 64., 0.2692   # 650-700: 2 pts, 4,000 ev, chi2/ndf 0.1/1, p 0.748
+  elif mass < 849: return 66., 0.2557   # 750-800: 2 pts, 4,000 ev, chi2/ndf 0.1/1, p 0.744
+  elif mass < 949: return 68., 0.2538   # 850-900: 2 pts, 4,000 ev, chi2/ndf 1.5/1, p 0.217
+  elif mass < 1249: return 70., 0.2431  # 950-1200: 6 pts, 109,000 ev, chi2/ndf 7.2/5, p 0.206
+  # Everything below this line is the approved request's table, untouched.
+  # No point in this request reaches it (highest mStop here is 1200); it is kept so
+  # that the inherited table stays diffable outside our grid. check_eff asserts
+  # that no requested mass falls through to these rows.
   elif mass < 1299: return 70., 0.242
   elif mass < 1349: return 70., 0.241
   elif mass < 1399: return 70., 0.237
@@ -134,7 +162,6 @@ def matchParams(mass):
   elif mass < 2449: return 70., 0.261
   elif mass < 2499: return 70., 0.264
   elif mass < 2549: return 70., 0.266
-  ### Just for testing
   else: return 70., 0.243
 
 # Points contained in this request — design plane is (mStop, DeltaM); mStop is fixed in this file.
@@ -170,11 +197,11 @@ qcut, tru_eff = matchParams(350)
 #   request carried several mStops.)
 mcm_eff = tru_eff
 
-# The table values were measured by the approved-request authors with T2tt. Whether they hold
-# for our topologies (T2cc/T2ttC/T2bWC) and the compressed grid (DeltaM 10-80) is not yet known
-# -> to be re-measured in a private GEN validation and updated.
-# Today this number affects only the efficiency reported to McM (= produced amount); with ratio 1
-# it does not affect ConfigWeight or the grid shape.
+# The tru_eff values above are our own measurement on our own gridpacks (see the provenance
+# comment on the table). They replace the approved request's T2tt numbers, which were measured
+# on a different gridpack and were off by up to 26% at the low end of our grid.
+# This number affects only the efficiency reported to McM (= how many events production must
+# generate); with ratio 1 it does not affect ConfigWeight or the grid shape.
 
 for mstop, mlsp, nev in mpoints:
     wgt = nev * (mcm_eff / tru_eff)

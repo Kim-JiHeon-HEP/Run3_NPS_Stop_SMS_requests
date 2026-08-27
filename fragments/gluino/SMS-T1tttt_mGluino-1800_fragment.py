@@ -92,22 +92,58 @@ generator = cms.EDFilter("Pythia8GeneratorFilter",
 
 model = "T1tttt"
 
-# MLM matching scale. Taken from the approved-request table unchanged (kept symbolic so a
-# reviewer can diff against the approved request).
-# ⚠ This table was measured on Run2 gluino gridpacks; the Run3 gridpacks are a different build,
-#   so the inheritance is less well-grounded than for stop -> to be re-measured in a private
-#   GEN validation and updated.
+# MLM matching parameters, indexed by mGluino.
+#
+#   qcut    -- UNCHANGED, inherited verbatim from the approved request. This is a
+#              value we *choose*, not one we measure, and the efficiencies below
+#              were measured with exactly these qcut values: changing qcut would
+#              invalidate them.
+#   tru_eff -- REPLACED with our own measurement (see provenance below). The table
+#              we inherited was measured on a different gridpack, and disagreed
+#              with our gridpacks by up to 19% (worst point in this family).
+#
+# Provenance of tru_eff
+#   Measured in a private GEN validation run (CMSSW_14_0_22_patch1, HTCondor, 2026-08),
+#   using these very fragments with a single mass point left in each. Efficiency is
+#   accepted/tried as reported by the Pythia8 MLM matching veto, i.e. the same
+#   quantity McM calls the match efficiency.
+#   Statistics: 530,000 generated events over 70 distinct mGluino values
+#   (every mGluino value that appears in this request was measured; none is interpolated).
+#   Topology and LSP mass are folded together: at fixed mGluino the topologies and
+#   DeltaM values we cross-checked agreed to within 1.0 sigma (22 points, 6 groups).
+#   That is expected -- MLM matching happens between the hard process and the parton
+#   shower, while the SUSY decay chain is applied afterwards.
+#   T1tttt/T1ttbb/T5ttcc all read the same gridpack (SMS-GlGl, xqcut 30), so there is
+#   nothing topology-dependent left for matching to see.
+#
+# Binning rule
+#   Steps are placed where qcut steps, so that qcut(mass) is bit-for-bit what the
+#   approved request had. Within each qcut interval the measured points are tested
+#   against a single constant; if they are consistent (chi2 p-value >= 0.05) they
+#   are merged and the row carries their weighted mean. 9 of the 10 qcut intervals
+#   passed unchanged. Intervals that failed are split further (still inside the same
+#   qcut interval, so qcut is still untouched); those rows are marked SPLIT below.
+#   Point-by-point values are deliberately NOT used: at 2k events per point the
+#   binomial spread alone is about +-1.0 percentage point, which would put noise
+#   into the table as if it were structure.
+#
+# Columns below: <upper bound>  qcut  tru_eff  [n points, events, chi2/ndf, p]
 def matchParams(mass):
-    if   mass<799: return 118., 0.235
-    elif mass<999: return 128., 0.235
-    elif mass<1199: return 140., 0.235
-    elif mass<1399: return 143., 0.245
-    elif mass<1499: return 147., 0.255
-    elif mass<1799: return 150., 0.267
-    elif mass<2099: return 156., 0.290
-    elif mass<2301: return 160., 0.315
-    elif mass<2601: return 162., 0.340
-    elif mass<2851: return 168, 0.364
+    if mass < 649: return 118., 0.2643     # 600-600: 1 pt, 132,000 ev, chi2/ndf 0.0/0, p 1.000, SPLIT
+    elif mass < 799: return 118., 0.2467   # 650-750: 3 pts, 6,000 ev, chi2/ndf 3.6/2, p 0.168, SPLIT
+    elif mass < 999: return 128., 0.2484   # 800-975: 6 pts, 78,000 ev, chi2/ndf 3.5/5, p 0.621
+    elif mass < 1199: return 140., 0.2438  # 1000-1175: 8 pts, 16,000 ev, chi2/ndf 3.5/7, p 0.833
+    elif mass < 1399: return 143., 0.2400  # 1200-1375: 8 pts, 16,000 ev, chi2/ndf 3.2/7, p 0.871
+    elif mass < 1499: return 147., 0.2467  # 1400-1475: 4 pts, 8,000 ev, chi2/ndf 0.4/3, p 0.947
+    elif mass < 1799: return 150., 0.2508  # 1500-1775: 12 pts, 24,000 ev, chi2/ndf 11.7/11, p 0.384
+    elif mass < 2099: return 156., 0.2578  # 1800-2075: 12 pts, 121,000 ev, chi2/ndf 12.2/11, p 0.345
+    elif mass < 2301: return 160., 0.2735  # 2100-2300: 5 pts, 10,000 ev, chi2/ndf 1.4/4, p 0.848
+    elif mass < 2601: return 162., 0.2825  # 2350-2600: 6 pts, 12,000 ev, chi2/ndf 3.7/5, p 0.589
+    elif mass < 2851: return 168., 0.3154  # 2650-2850: 5 pts, 107,000 ev, chi2/ndf 4.9/4, p 0.302
+    # Everything below this line is the approved request's table, untouched.
+    # No point in this request reaches it (highest mGluino here is 2850); it is kept so
+    # that the inherited table stays diffable outside our grid. check_eff asserts
+    # that no requested mass falls through to these rows.
     else: return 160., 0.315
 
 # Points contained in this request — design plane is (mGluino, mLSP); mGluino is fixed in this file.
