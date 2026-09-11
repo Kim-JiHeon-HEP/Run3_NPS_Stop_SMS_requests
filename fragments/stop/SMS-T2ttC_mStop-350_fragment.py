@@ -56,6 +56,7 @@ DECAY   2000004     0.00000000E+00   # scharm_R decays
 DECAY   1000005     0.00000000E+00   # sbottom1 decays
 DECAY   2000005     0.00000000E+00   # sbottom2 decays
 DECAY   1000006     1.00000000E+00   # stop1 decays
+    0.00000000E+00    2    1000022      4     # dummy allowed decay, in order to turn on off-shell decays
     1.00000000E+00    3    1000022      5     24  # stop -> LSP + b + W*  (top off-shell)
     0.00000000E+00    2    1000022      6         # on-shell top channel disabled
 DECAY   2000006     0.00000000E+00   # stop2 decays
@@ -237,7 +238,6 @@ for mstop, mlsp, nev in mpoints:
             '6:m0 = 172.5',
             'Check:abortIfVeto = on',
             'TauDecays:externalMode=2',
-            'SLHA:allowOnlyOffShell = on',   # no on-shell path exists in the compressed region
             '24:mMin = 0.1',                 # W mass sampling floor; the default 10 would switch decays off at DeltaM 10
         ),
         parameterSets = cms.vstring('pythia8CommonSettings',

@@ -229,7 +229,6 @@ for mstop, mlsp, nev in mpoints:
             '6:m0 = 172.5',
             'Check:abortIfVeto = on',
             'TauDecays:externalMode=2',
-            'SLHA:allowOnlyOffShell = on',   # no on-shell path exists in the compressed region
             '24:mMin = 0.1',                 # W mass sampling floor; the default 10 would switch decays off at DeltaM 10
         ),
         parameterSets = cms.vstring('pythia8CommonSettings',

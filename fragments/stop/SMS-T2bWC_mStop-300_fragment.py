@@ -72,6 +72,7 @@ DECAY   1000021     0.00000000E+00   # gluino decays
 DECAY   1000022     0.00000000E+00   # neutralino1 decays
 DECAY   1000023     0.00000000E+00   # neutralino2 decays
 DECAY   1000024     1.00000000E+00   # chargino1+ decays
+    0.00000000E+00    3    1000022     -1     2 # dummy allowed decay, in order to turn on off-shell decays
     1.00000000E+00    2    1000022     24     # chargino -> LSP + W(*)
 DECAY   1000025     0.00000000E+00   # neutralino3 decays
 DECAY   1000035     0.00000000E+00   # neutralino4 decays
@@ -231,7 +232,6 @@ for mstop, mlsp, nev in mpoints:
             '6:m0 = 172.5',
             'Check:abortIfVeto = on',
             'TauDecays:externalMode=2',
-            'SLHA:allowOnlyOffShell = on',   # no on-shell path exists in the compressed region
             '24:mMin = 0.1',                 # W mass sampling floor; the default 10 would switch decays off at DeltaM 10
         ),
         parameterSets = cms.vstring('pythia8CommonSettings',
